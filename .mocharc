@@ -1,0 +1,5 @@
+--colors
+--full-trace
+--compilers js:babel-core/register
+--recursive
+./src/*.test.js

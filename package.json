@@ -1,0 +1,34 @@
+{
+  "name": "react-native-digest-fetch",
+  "version": "1.0.0",
+  "description": "Fetch which responds to digest challenges for react native",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha --opts ./.mocharc",
+    "build": "./node_modules/.bin/babel ./src/index.js --out-dir dist"
+  },
+  "keywords": [
+    "react-native",
+    "fetch",
+    "digest",
+    "digest-auth",
+    "digest-fetch",
+    "digestfetch"
+  ],
+  "author": "wizebin",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "chai": "^4.1.2",
+    "mocha": "^5.0.5"
+  },
+  "dependencies": {
+    "crypto-js": "^3.1.9-1",
+    "node-fetch": "^2.1.2",
+    "underscore": "^1.8.3",
+    "url": "^0.11.0"
+  }
+}
