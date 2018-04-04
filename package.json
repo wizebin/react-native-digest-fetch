@@ -2,7 +2,7 @@
   "name": "react-native-digest-fetch",
   "version": "1.0.0",
   "description": "Fetch which responds to digest challenges for react native",
-  "main": "dist/index.js",
+  "main": "./dist/src/index.js",
   "scripts": {
     "test": "./node_modules/.bin/mocha --opts ./.mocharc",
     "build": "./node_modules/.bin/babel ./src/index.js --out-dir dist"
@@ -17,6 +17,10 @@
   ],
   "author": "wizebin",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wizebin/react-native-digest-fetch.git"
+  },
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
