@@ -1,5 +1,5 @@
 --colors
 --full-trace
---compilers js:babel-core/register
+--require ./mocha_babel_hook.js
 --recursive
 ./src/*.test.js
