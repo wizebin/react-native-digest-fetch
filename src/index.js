@@ -30,17 +30,19 @@ function getDigestChallengeParts(digestChallenge) {
   }, {});
 }
 
-let globalNonceId = 0;
-export function setNextNonceId(nextId) {
-  globalNonceId = nextId;
+export function setNextNonceCount(nextId) {
+  getNextNonceCount.nonceCount = nextId;
 }
 
 /**
  * Incremented nonce used in responses to server challenges
  */
-export function getNextNonceId() {
-  globalNonceId = (((globalNonceId || 0) + 1) % 100000000);
-  return ('' + globalNonceId).padStart(8, '0');
+export function getNextNonceCount() {
+  if (typeof getNextNonceCount.nonceCount === 'undefined') {
+    getNextNonceCount.nonceCount = 0;
+  }
+  getNextNonceCount.nonceCount = (((getNextNonceCount.nonceCount || 0) + 1) % 100000000);
+  return ('' + getNextNonceCount.nonceCount).padStart(8, '0');
 }
 
 export function omitNullValues(data) {
@@ -73,14 +75,14 @@ export function getDigestHeaderValue(digestChallenge, { url, method, headers, us
   const pathHash = cryptojs.MD5([method, path].join(':'));
 
   let cnonce = null;
-  let nc = null;
+  let nonce_count = null;
   if (typeof challengeParts.qop === 'string') {
     cnonce = cryptojs.MD5(Math.random().toString(36)).toString(cryptojs.enc.Hex).substr(0, 8);
-    nc = getNextNonceId();
+    nonce_count = getNextNonceCount();
   }
 
   const responseParams = [authHash.toString(cryptojs.enc.Hex), challengeParts.nonce]
-    .concat(cnonce ? [nc, cnonce] : [])
+    .concat(cnonce ? [nonce_count, cnonce] : [])
     .concat([challengeParts.qop, pathHash.toString(cryptojs.enc.Hex)]);
 
   const authParams = omitNullValues({
@@ -89,7 +91,7 @@ export function getDigestHeaderValue(digestChallenge, { url, method, headers, us
     uri: path,
     algorithm: 'MD5',
     response: cryptojs.MD5(responseParams.join(':')).toString(cryptojs.enc.Hex),
-    nc,
+    nc: nonce_count,
     cnonce,
   });
 

@@ -1,12 +1,12 @@
 import { expect } from 'chai';
-import { getNextNonceId, setNextNonceId, quoteIfRelevant } from './index';
+import { getNextNonceCount, setNextNonceCount, quoteIfRelevant } from './index';
 
 describe('digest fetch', () => {
   describe('nonce', () => {
     it('returns nonces as expected', () => {
-      let prev = getNextNonceId();
+      let prev = getNextNonceCount();
       for(let a = 0; a < 11; a++) {
-        const temp = getNextNonceId();
+        const temp = getNextNonceCount();
         expect(temp).have.lengthOf(8);
         expect(parseInt(temp)).equal(parseInt(prev) + 1);
         prev = temp;
@@ -14,9 +14,9 @@ describe('digest fetch', () => {
     });
 
     it('rolls over at 9 digits', () => {
-      setNextNonceId(99999998);
-      expect(getNextNonceId()).equal('99999999');
-      expect(getNextNonceId()).equal('00000000');
+      setNextNonceCount(99999998);
+      expect(getNextNonceCount()).equal('99999999');
+      expect(getNextNonceCount()).equal('00000000');
     });
   });
 

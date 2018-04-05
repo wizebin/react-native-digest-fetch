@@ -6,8 +6,8 @@ Object.defineProperty(exports, "__esModule", {
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-exports.setNextNonceId = setNextNonceId;
-exports.getNextNonceId = getNextNonceId;
+exports.setNextNonceCount = setNextNonceCount;
+exports.getNextNonceCount = getNextNonceCount;
 exports.omitNullValues = omitNullValues;
 exports.quoteIfRelevant = quoteIfRelevant;
 exports.getDigestHeaderValue = getDigestHeaderValue;
@@ -55,17 +55,19 @@ function getDigestChallengeParts(digestChallenge) {
   }, {});
 }
 
-var globalNonceId = 0;
-function setNextNonceId(nextId) {
-  globalNonceId = nextId;
+function setNextNonceCount(nextId) {
+  getNextNonceCount.nonceCount = nextId;
 }
 
 /**
  * Incremented nonce used in responses to server challenges
  */
-function getNextNonceId() {
-  globalNonceId = ((globalNonceId || 0) + 1) % 100000000;
-  return ('' + globalNonceId).padStart(8, '0');
+function getNextNonceCount() {
+  if (typeof getNextNonceCount.nonceCount === 'undefined') {
+    getNextNonceCount.nonceCount = 0;
+  }
+  getNextNonceCount.nonceCount = ((getNextNonceCount.nonceCount || 0) + 1) % 100000000;
+  return ('' + getNextNonceCount.nonceCount).padStart(8, '0');
 }
 
 function omitNullValues(data) {
@@ -104,20 +106,20 @@ function getDigestHeaderValue(digestChallenge, _ref) {
   var pathHash = _cryptoJs2.default.MD5([method, path].join(':'));
 
   var cnonce = null;
-  var nc = null;
+  var nonce_count = null;
   if (typeof challengeParts.qop === 'string') {
     cnonce = _cryptoJs2.default.MD5(Math.random().toString(36)).toString(_cryptoJs2.default.enc.Hex).substr(0, 8);
-    nc = getNextNonceId();
+    nonce_count = getNextNonceCount();
   }
 
-  var responseParams = [authHash.toString(_cryptoJs2.default.enc.Hex), challengeParts.nonce].concat(cnonce ? [nc, cnonce] : []).concat([challengeParts.qop, pathHash.toString(_cryptoJs2.default.enc.Hex)]);
+  var responseParams = [authHash.toString(_cryptoJs2.default.enc.Hex), challengeParts.nonce].concat(cnonce ? [nonce_count, cnonce] : []).concat([challengeParts.qop, pathHash.toString(_cryptoJs2.default.enc.Hex)]);
 
   var authParams = omitNullValues(_extends({}, _underscore2.default.pick(challengeParts, ['realm', 'nonce', 'opaque', 'qop']), {
     username: username,
     uri: path,
     algorithm: 'MD5',
     response: _cryptoJs2.default.MD5(responseParams.join(':')).toString(_cryptoJs2.default.enc.Hex),
-    nc: nc,
+    nc: nonce_count,
     cnonce: cnonce
   }));
 
