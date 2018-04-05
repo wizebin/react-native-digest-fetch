@@ -4,7 +4,7 @@ This package implements digest authentication for react native using the fetch l
 
 Digest fetch takes the same parameters as whatwg/fetch, with the addition of two parameters: `username` and `password`.
 
-If the server does not request with a `www-authenticate` header this function will act exactly like fetch typically does.
+If the server does not respond with a `www-authenticate` header this function will act exactly like fetch typically does.
 
 ## Install
 
@@ -40,6 +40,6 @@ and use it like so
 
     getDigestHeaderValue(serverHeaders['www-authenticate'], { url, method, headers, username, password });
 
-## Web usage or node usage
+## Web usage
 
-This library is untested on web or non-react-native node, but should work just fine.
+This library has been tested on react-native and vanilla node, but has not been tested on a front-end node project.
