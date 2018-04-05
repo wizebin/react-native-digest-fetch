@@ -7,15 +7,12 @@ Object.defineProperty(exports, "__esModule", {
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 exports.setNextNonceCount = setNextNonceCount;
+exports.padStart = padStart;
 exports.getNextNonceCount = getNextNonceCount;
 exports.omitNullValues = omitNullValues;
 exports.quoteIfRelevant = quoteIfRelevant;
 exports.getDigestHeaderValue = getDigestHeaderValue;
 exports.default = fetchWithDigest;
-
-var _underscore = require('underscore');
-
-var _underscore2 = _interopRequireDefault(_underscore);
 
 var _cryptoJs = require('crypto-js');
 
@@ -33,6 +30,25 @@ if (typeof window !== 'undefined' && typeof window.fetch === 'undefined') {
 }
 if (typeof global !== 'undefined' && typeof global.fetch === 'undefined') {
   global.fetch = require('node-fetch');
+}
+
+function keys(object) {
+  var result = [];
+  for (var key in object) {
+    if (object.hasOwnProperty(key)) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+
+function pick(object, whitelist) {
+  var result = {};
+  var keylength = whitelist.length;
+  for (var keyIndex = 0; keyIndex < keylength; keyIndex += 1) {
+    result[whitelist[keyIndex]] = object[whitelist[keyIndex]];
+  }
+  return result;
 }
 
 /**
@@ -59,6 +75,13 @@ function setNextNonceCount(nextId) {
   getNextNonceCount.nonceCount = nextId;
 }
 
+function padStart(string, length, paddingCharacter) {
+  if (string.length < length) {
+    return paddingCharacter.repeat(length - string.length) + string;
+  }
+  return string;
+}
+
 /**
  * Incremented nonce used in responses to server challenges
  */
@@ -67,11 +90,11 @@ function getNextNonceCount() {
     getNextNonceCount.nonceCount = 0;
   }
   getNextNonceCount.nonceCount = ((getNextNonceCount.nonceCount || 0) + 1) % 100000000;
-  return ('' + getNextNonceCount.nonceCount).padStart(8, '0');
+  return padStart('' + getNextNonceCount.nonceCount, 8, '0');
 }
 
 function omitNullValues(data) {
-  return _underscore2.default.keys(data).reduce(function (result, key) {
+  return keys(data).reduce(function (result, key) {
     if (data[key] !== null) result[key] = data[key];
     return result;
   }, {});
@@ -114,7 +137,7 @@ function getDigestHeaderValue(digestChallenge, _ref) {
 
   var responseParams = [authHash.toString(_cryptoJs2.default.enc.Hex), challengeParts.nonce].concat(cnonce ? [nonce_count, cnonce] : []).concat([challengeParts.qop, pathHash.toString(_cryptoJs2.default.enc.Hex)]);
 
-  var authParams = omitNullValues(_extends({}, _underscore2.default.pick(challengeParts, ['realm', 'nonce', 'opaque', 'qop']), {
+  var authParams = omitNullValues(_extends({}, pick(challengeParts, ['realm', 'nonce', 'opaque', 'qop']), {
     username: username,
     uri: path,
     algorithm: 'MD5',
@@ -123,7 +146,7 @@ function getDigestHeaderValue(digestChallenge, _ref) {
     cnonce: cnonce
   }));
 
-  var paramArray = _underscore2.default.keys(authParams).reduce(function (result, key) {
+  var paramArray = keys(authParams).reduce(function (result, key) {
     if (typeof authParams[key] !== 'function') {
       result.push(key + '=' + quoteIfRelevant(authParams, key));
     }

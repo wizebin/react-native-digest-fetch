@@ -1,4 +1,3 @@
-import _ from 'underscore';
 import cryptojs from 'crypto-js';
 import URL from 'url';
 
@@ -8,6 +7,25 @@ if (typeof window !== 'undefined' && typeof window.fetch === 'undefined') {
 }
 if (typeof global !== 'undefined' && typeof global.fetch === 'undefined') {
   global.fetch = require('node-fetch');
+}
+
+function keys(object) {
+  const result = [];
+  for(let key in object) {
+    if (object.hasOwnProperty(key)) {
+      result.push(key);
+    }
+  }
+  return result;
+}
+
+function pick(object, whitelist) {
+  const result = {};
+  const keylength = whitelist.length;
+  for(let keyIndex = 0; keyIndex < keylength; keyIndex += 1) {
+    result[whitelist[keyIndex]] = object[whitelist[keyIndex]];
+  }
+  return result;
 }
 
 /**
@@ -34,6 +52,13 @@ export function setNextNonceCount(nextId) {
   getNextNonceCount.nonceCount = nextId;
 }
 
+export function padStart(string, length, paddingCharacter) {
+  if (string.length < length) {
+    return paddingCharacter.repeat(length - string.length) + string;
+  }
+  return string;
+}
+
 /**
  * Incremented nonce used in responses to server challenges
  */
@@ -42,11 +67,11 @@ export function getNextNonceCount() {
     getNextNonceCount.nonceCount = 0;
   }
   getNextNonceCount.nonceCount = (((getNextNonceCount.nonceCount || 0) + 1) % 100000000);
-  return ('' + getNextNonceCount.nonceCount).padStart(8, '0');
+  return padStart('' + getNextNonceCount.nonceCount, 8, '0');
 }
 
 export function omitNullValues(data) {
-  return _.keys(data).reduce((result, key) => {
+  return keys(data).reduce((result, key) => {
     if (data[key] !== null) result[key] = data[key];
     return result;
   }, {});
@@ -86,7 +111,7 @@ export function getDigestHeaderValue(digestChallenge, { url, method, headers, us
     .concat([challengeParts.qop, pathHash.toString(cryptojs.enc.Hex)]);
 
   const authParams = omitNullValues({
-    ..._.pick(challengeParts, ['realm', 'nonce', 'opaque', 'qop']),
+    ...pick(challengeParts, ['realm', 'nonce', 'opaque', 'qop']),
     username: username,
     uri: path,
     algorithm: 'MD5',
@@ -95,7 +120,7 @@ export function getDigestHeaderValue(digestChallenge, { url, method, headers, us
     cnonce,
   });
 
-  const paramArray = _.keys(authParams).reduce((result, key) => {
+  const paramArray = keys(authParams).reduce((result, key) => {
     if (typeof(authParams[key]) !== 'function') {
       result.push(`${key}=${quoteIfRelevant(authParams, key)}`);
     }
