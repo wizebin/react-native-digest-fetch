@@ -26,10 +26,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // If the user's environment already includes fetch, we want to use it
 if (typeof window !== 'undefined' && typeof window.fetch === 'undefined') {
-  window.fetch = require('node-fetch');
+  window.fetch = require('node-fetch').default;
 }
 if (typeof global !== 'undefined' && typeof global.fetch === 'undefined') {
-  global.fetch = require('node-fetch');
+  global.fetch = require('node-fetch').default;
 }
 
 function keys(object) {
