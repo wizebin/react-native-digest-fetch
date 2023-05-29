@@ -12,11 +12,11 @@ If the server does not respond with a `www-authenticate` header this function wi
 
 ## Usage
 
-    import fetch from 'react-native-digest-fetch';
+    import fetchWithDigest from 'react-native-digest-fetch';
 
 `...`
 
-    digestFetch('http://api.test.com/endpoint/', {
+    fetchWithDigest('http://api.test.com/endpoint/', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
